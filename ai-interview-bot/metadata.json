@@ -1,0 +1,6 @@
+{
+  "name": "AI Interview Bot",
+  "description": "Interactive AI-powered mock interview application that generates dynamic role-based questions, evaluates candidate answers with granular feedback, and provides comprehensive performance scorecards.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

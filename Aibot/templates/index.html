@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Interview Bot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="bg"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">AI</span>
+      <span>Interview Bot</span>
+    </div>
+    <div class="status">
+      <span id="statusDot" class="dot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Screen 1: Setup -->
+    <section id="screen-setup" class="screen active">
+      <div class="card welcome-card">
+        <h1>Practice for your dream job</h1>
+        <p class="subtitle">
+          Choose a role, and an AI interviewer will ask real interview questions,
+          score your answers, and give you feedback.
+        </p>
+
+        <label class="field">
+          <span class="label">Job Role</span>
+          <select id="roleSelect"></select>
+        </label>
+
+        <label class="field">
+          <span class="label">Difficulty</span>
+          <select id="difficultySelect">
+            <option value="Easy">Easy</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </label>
+
+        <p class="hint" id="totalHint"></p>
+
+        <button id="startBtn" class="btn primary">Start Interview</button>
+        <p id="setupError" class="error"></p>
+      </div>
+    </section>
+
+    <!-- Screen 2: Interview -->
+    <section id="screen-interview" class="screen">
+      <div class="card interview-card">
+        <div class="progress-row">
+          <span id="questionCount" class="pill"></span>
+          <span id="sessionInfo" class="pill alt"></span>
+        </div>
+
+        <div id="questionBlock">
+          <h2 class="question" id="questionText"></h2>
+          <div class="answer-area">
+            <textarea id="answerInput" placeholder="Type your answer here..." rows="6"></textarea>
+          </div>
+          <button id="submitBtn" class="btn primary">Submit Answer</button>
+          <button id="skipBtn" class="btn ghost">Skip Question</button>
+          <p id="interviewError" class="error"></p>
+        </div>
+
+        <div id="feedbackBlock" class="hidden">
+          <div class="score-row">
+            <div class="score-ring" id="scoreRing">
+              <span id="scoreText">0</span>
+            </div>
+            <div class="score-label">/100</div>
+          </div>
+          <h3>Feedback</h3>
+          <p class="feedback-text" id="feedbackText"></p>
+          <div class="lists">
+            <div>
+              <h4 class="good">Strengths</h4>
+              <ul id="strengthsList"></ul>
+            </div>
+            <div>
+              <h4 class="bad">Improvements</h4>
+              <ul id="improvementsList"></ul>
+            </div>
+          </div>
+          <button id="nextBtn" class="btn primary">Next Question</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 3: Results -->
+    <section id="screen-results" class="screen">
+      <div class="card result-card">
+        <h1>Interview Complete</h1>
+        <div class="big-score">
+          <span id="finalScore">0</span><small>/100</small>
+        </div>
+        <p class="verdict" id="verdictText"></p>
+        <p class="verdict-sub" id="verdictSub"></p>
+
+        <h3>Question Breakdown</h3>
+        <div id="breakdown" class="breakdown"></div>
+
+        <button id="restartBtn" class="btn primary">Start New Interview</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">Powered by Groq LLM API</footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
