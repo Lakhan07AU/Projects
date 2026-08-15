@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile - RoadGuard AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/forms.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="container py-5">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm p-4 text-center">
+          <i class="bi bi-person-circle text-primary" style="font-size:5rem;"></i>
+          <h5 class="mt-3 mb-0" id="profileName">-</h5>
+          <div class="badge bg-light text-dark mt-2" id="profileRole">-</div>
+          <hr>
+          <div class="text-start small">
+            <div class="mb-2"><i class="bi bi-envelope me-2 text-muted"></i><span id="profileEmail">-</span></div>
+            <div class="mb-2"><i class="bi bi-telephone me-2 text-muted"></i><span id="profilePhone">-</span></div>
+            <div><i class="bi bi-journal-check me-2 text-muted"></i><span id="profileCreated">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm p-4">
+          <h5 class="mb-4">Update Profile</h5>
+          <form id="profileForm" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="name">Full name</label>
+              <input type="text" class="form-control" id="name" required minlength="2">
+              <div class="invalid-feedback">Enter your name.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="phone">Phone</label>
+              <input type="tel" class="form-control" id="phone" pattern="[0-9+ ]{8,15}">
+              <div class="invalid-feedback">Enter a valid phone number.</div>
+            </div>
+            <button class="btn btn-brand px-4" id="saveBtn" type="submit"><i class="bi bi-check2 me-2"></i>Save Changes</button>
+          </form>
+        </div>
+
+        <div class="card border-0 shadow-sm p-4 mt-4">
+          <h5 class="mb-4">Change Password</h5>
+          <form id="passwordForm" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="current">Current password</label>
+              <input type="password" class="form-control" id="current" required>
+              <div class="invalid-feedback">Required.</div>
+            </div>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label" for="newpass">New password</label>
+                <input type="password" class="form-control" id="newpass" required minlength="8">
+                <div class="invalid-feedback">At least 8 characters.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="confirm">Confirm new password</label>
+                <input type="password" class="form-control" id="confirm" required>
+                <div class="invalid-feedback">Passwords must match.</div>
+              </div>
+            </div>
+            <button class="btn btn-brand px-4 mt-3" id="passBtn" type="submit"><i class="bi bi-shield-lock me-2"></i>Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    AUTH.requireAuth();
+    COMPONENTS.publicNavbar("profile");
+    COMPONENTS.footer();
+
+    const user = AUTH.getUser();
+    document.getElementById("profileName").textContent = user.name;
+    document.getElementById("profileRole").textContent = AUTH.ROLE_LABELS[user.role] || user.role;
+    document.getElementById("profileEmail").textContent = user.email;
+    document.getElementById("profilePhone").textContent = user.phone || "Not provided";
+    document.getElementById("profileCreated").textContent = user.created_at ? "Joined " + UTILS.fmtDate(user.created_at) : "";
+    document.getElementById("name").value = user.name;
+    document.getElementById("phone").value = user.phone || "";
+
+    document.getElementById("profileForm").addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const form = ev.target;
+      if (!form.checkValidity()) { form.classList.add("was-validated"); return; }
+      const btn = document.getElementById("saveBtn");
+      UTILS.spinnerButton(btn, true, "Saving...");
+      try {
+        const updated = await API.patch("/auth/me", {
+          name: document.getElementById("name").value.trim(),
+          phone: document.getElementById("phone").value.trim() || null,
+        });
+        AUTH.setUser(updated);
+        UTILS.toast("Profile updated.");
+        document.getElementById("profileName").textContent = updated.name;
+        document.getElementById("profilePhone").textContent = updated.phone || "Not provided";
+      } catch (e) { UTILS.toast(e.message, "danger"); }
+      UTILS.spinnerButton(btn, false);
+    });
+
+    document.getElementById("passwordForm").addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const form = ev.target;
+      const np = document.getElementById("newpass").value;
+      const cp = document.getElementById("confirm").value;
+      if (np !== cp) { UTILS.toast("Passwords do not match.", "danger"); return; }
+      if (!form.checkValidity()) { form.classList.add("was-validated"); return; }
+      const btn = document.getElementById("passBtn");
+      UTILS.spinnerButton(btn, true, "Updating...");
+      try {
+        await API.post("/auth/me/password", {
+          current_password: document.getElementById("current").value,
+          new_password: np,
+        });
+        form.reset();
+        UTILS.toast("Password updated.");
+      } catch (e) { UTILS.toast(e.message, "danger"); }
+      UTILS.spinnerButton(btn, false);
+    });
+  </script>
+</body>
+</html>

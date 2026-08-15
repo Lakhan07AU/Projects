@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Complaints - RoadGuard AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="mb-0"><i class="bi bi-list-check me-2 text-primary"></i>My Complaints</h4>
+      <a href="report.html" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i>Report a Pothole</a>
+    </div>
+    <div class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light"><tr>
+            <th>ID</th><th>Image</th><th>Severity</th><th>Confidence</th><th>Status</th><th>Duplicate</th><th>Reported</th>
+          </tr></thead>
+          <tbody id="complaintsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    AUTH.requireAuth();
+    COMPONENTS.publicNavbar("complaints");
+    COMPONENTS.footer();
+
+    async function load() {
+      UTILS.showLoading("complaintsBody");
+      try {
+        const rows = await API.get("/reports");
+        const el = document.getElementById("complaintsBody");
+        if (!rows.length) {
+          UTILS.emptyState("complaintsBody", "No complaints yet", "Report your first pothole to track it here.");
+          return;
+        }
+        el.innerHTML = rows.map((r) => `
+          <tr>
+            <td class="fw-bold">${UTILS.esc(r.report_code)}</td>
+            <td>${r.image_path ? `<img src="${r.image_path}" width="56" height="42" style="object-fit:cover;border-radius:6px;">` : "-"}</td>
+            <td>${UTILS.severityBadge(r.severity)}</td>
+            <td>${UTILS.confidencePct(r.ai_confidence)}</td>
+            <td>${UTILS.statusBadge(r.status)}</td>
+            <td>${r.is_duplicate ? `<span class="badge bg-warning-subtle text-dark">Duplicate${r.duplicate_of ? " of " + UTILS.esc(r.duplicate_of) : ""}</span>` : '<span class="badge bg-light text-muted">New</span>'}</td>
+            <td class="text-muted-sm">${UTILS.fmtDate(r.created_at)}</td>
+          </tr>`).join("");
+      } catch (e) { UTILS.errorState("complaintsBody", e.message); }
+    }
+
+    load();
+  </script>
+</body>
+</html>

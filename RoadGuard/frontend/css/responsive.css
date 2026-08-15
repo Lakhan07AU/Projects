@@ -1,0 +1,11 @@
+/* RoadGuard AI - responsive tweaks */
+@media (max-width: 768px) {
+  .dash-content { padding: 1rem; }
+  .stat-card { padding: .9rem 1rem; }
+  .stat-card .stat-value { font-size: 1.2rem; }
+  .rg-table { font-size: .8rem; }
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .map-toolbar { flex-direction: column; align-items: stretch; }
+  .auth-card { padding: 1.6rem 1.2rem; }
+  .chat-box { height: 340px; }
+}

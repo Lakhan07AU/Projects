@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Potholes - RoadGuard AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/dashboard.css" rel="stylesheet">
+  <link href="../css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div class="dash-wrap">
+    <div id="sidebar"></div>
+    <div class="dash-main">
+      <div class="dash-topbar">
+        <button class="btn btn-sm btn-light d-lg-none" onclick="document.getElementById('rgSidebar').classList.toggle('open')"><i class="bi bi-list"></i></button>
+        <h5 id="pageTitle">Potholes</h5>
+        <div class="d-flex align-items-center gap-3">
+          <a href="/notifications.html" class="text-muted"><i class="bi bi-bell fs-5"></i></a>
+          <span class="badge bg-primary" id="topbarUser"></span>
+        </div>
+      </div>
+      <div class="dash-content">
+        <div class="filter-bar mb-3">
+          <input type="text" class="form-control form-control-sm" style="max-width:220px;" id="searchBox" placeholder="Search code / road">
+          <select class="form-select form-select-sm w-auto" id="sevFilter"><option value="">All severity</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></select>
+          <select class="form-select form-select-sm w-auto" id="statusFilter"><option value="">All status</option></select>
+          <input type="text" class="form-control form-control-sm" style="max-width:120px;" id="wardBox" placeholder="Ward">
+          <button class="btn btn-primary btn-sm" onclick="load(0)"><i class="bi bi-search me-1"></i>Apply</button>
+          <button class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">Reset</button>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="table-responsive">
+            <table class="table rg-table align-middle mb-0">
+              <thead><tr>
+                <th>Code</th><th>Road</th><th>Ward</th><th>Severity</th><th>Priority</th><th>Status</th><th>Est. Cost</th><th>Reports</th><th style="min-width:220px;">Actions</th>
+              </tr></thead>
+              <tbody id="potholeBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="text-muted-sm" id="pageInfo"></span>
+          <div>
+            <button class="btn btn-sm btn-outline-secondary" id="prevBtn" onclick="load(offset-25)"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn btn-sm btn-outline-secondary" id="nextBtn" onclick="load(offset+25)"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign modal -->
+  <div class="modal fade" id="assignModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title">Assign Repair Team</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-muted" id="assignTarget"></p>
+        <div class="mb-3"><label class="form-label">Team</label><select class="form-select" id="teamSelect"></select></div>
+        <div class="mb-3"><label class="form-label">Deadline (days)</label><input type="number" class="form-control" id="deadlineDays" value="7" min="1"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-brand" id="assignBtn">Assign</button></div>
+    </div></div>
+  </div>
+
+  <!-- Priority modal -->
+  <div class="modal fade" id="prioModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title">Override Priority</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p class="small text-muted" id="prioTarget"></p>
+        <div class="mb-3"><label class="form-label">Priority</label>
+          <select class="form-select" id="prioSelect"><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></select>
+        </div>
+        <div class="mb-3"><label class="form-label">Reason</label><input type="text" class="form-control" id="prioReason" placeholder="Why is this being overridden?"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-brand" id="prioBtn">Save</button></div>
+    </div></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    if (!AUTH.requireAuth(["GOVERNMENT_OFFICIAL", "ADMIN"])) throw new Error();
+    COMPONENTS.demoBanner();
+    COMPONENTS.sidebar([
+      { key: "dashboard", href: "dashboard.html", icon: "bi-speedometer2", label: "Dashboard" },
+      { key: "potholes", href: "potholes.html", icon: "bi-exclamation-diamond", label: "Potholes" },
+      { key: "repairs", href: "repairs.html", icon: "bi-tools", label: "Repairs" },
+      { key: "analytics", href: "analytics.html", icon: "bi-bar-chart", label: "Analytics" },
+      { key: "costrates", href: "cost-rates.html", icon: "bi-cash-coin", label: "Cost Rates" },
+      { key: "users", href: "users.html", icon: "bi-people", label: "Users" },
+    ], "potholes");
+
+    const STATUSES = ["SUBMITTED","AI_ANALYZED","PENDING_VERIFICATION","VERIFIED","PRIORITIZED","ASSIGNED","IN_PROGRESS","COMPLETED","CITIZEN_VERIFICATION","CLOSED","REJECTED"];
+    const statusSel = document.getElementById("statusFilter");
+    STATUSES.forEach((s) => statusSel.insertAdjacentHTML("beforeend", `<option>${s}</option>`));
+
+    let offset = 0;
+    let teams = [];
+    let currentPothole = null;
+
+    async function loadTeams() {
+      try { teams = await API.get("/teams"); } catch (e) { teams = []; }
+      document.getElementById("teamSelect").innerHTML = teams.length
+        ? teams.map((t) => `<option value="${t.id}">${UTILS.esc(t.name)}${t.ward ? " (Ward " + UTILS.esc(t.ward) + ")" : ""}</option>`).join("")
+        : `<option value="">No teams available</option>`;
+    }
+
+    async function load(newOffset = 0) {
+      offset = Math.max(0, newOffset);
+      UTILS.showLoading("potholeBody");
+      const params = new URLSearchParams({ limit: "25", offset: String(offset) });
+      const sev = document.getElementById("sevFilter").value;
+      const status = document.getElementById("statusFilter").value;
+      const ward = document.getElementById("wardBox").value.trim();
+      const search = document.getElementById("searchBox").value.trim();
+      if (sev) params.set("severity", sev);
+      if (status) params.set("status", status);
+      if (ward) params.set("ward", ward);
+      if (search) params.set("search", search);
+      try {
+        const rows = await API.get("/potholes?" + params.toString());
+        document.getElementById("pageInfo").textContent = offset + 1 + " - " + (offset + rows.length) + " of ...";
+        document.getElementById("prevBtn").disabled = offset === 0;
+        document.getElementById("nextBtn").disabled = rows.length < 25;
+        const body = document.getElementById("potholeBody");
+        if (!rows.length) { UTILS.emptyState("potholeBody", "No potholes found", "Try adjusting the filters."); return; }
+        body.innerHTML = rows.map((p) => `
+          <tr>
+            <td class="fw-bold">${UTILS.esc(p.pothole_code)}</td>
+            <td>${UTILS.esc(p.road || "-")}</td>
+            <td>Ward ${UTILS.esc(p.ward || "-")}</td>
+            <td>${UTILS.severityBadge(p.severity)}</td>
+            <td>${UTILS.priorityBadge(p.priority)}</td>
+            <td>${UTILS.statusBadge(p.status)}</td>
+            <td class="num">${UTILS.fmtINR(p.estimated_cost)}</td>
+            <td>${p.report_count}</td>
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                ${["PENDING_VERIFICATION","AI_ANALYZED","SUBMITTED"].includes(p.status) ? `
+                  <button class="btn btn-sm btn-success" data-act="verify" data-id="${p.id}">Verify</button>
+                  <button class="btn btn-sm btn-outline-danger" data-act="reject" data-id="${p.id}">Reject</button>` : ""}
+                ${["VERIFIED","PRIORITIZED"].includes(p.status) ? `
+                  <button class="btn btn-sm btn-brand" data-act="assign" data-id="${p.id}">Assign</button>` : ""}
+                <button class="btn btn-sm btn-outline-primary" data-act="prio" data-id="${p.id}">Priority</button>
+              </div>
+            </td>
+          </tr>`).join("");
+        body.querySelectorAll("[data-act]").forEach((btn) => btn.addEventListener("click", () => onAction(btn.dataset.act, btn.dataset.id)));
+      } catch (e) { UTILS.errorState("potholeBody", e.message); }
+    }
+
+    async function onAction(act, id) {
+      const pothole = (await API.get("/potholes?limit=500&offset=0")).find((p) => p.id === id);
+      if (act === "verify") {
+        if (!confirm("Mark this pothole as VERIFIED?")) return;
+        await actVerbose(() => API.post(`/potholes/${id}/verify`, { action: "verify" }));
+      } else if (act === "reject") {
+        const reason = prompt("Rejection reason:");
+        if (reason === null) return;
+        await actVerbose(() => API.post(`/potholes/${id}/verify`, { action: "reject", reason }));
+      } else if (act === "assign") {
+        currentPothole = id;
+        document.getElementById("assignTarget").textContent = `Assigning ${UTILS.esc(pothole.pothole_code)}`;
+        new bootstrap.Modal(document.getElementById("assignModal")).show();
+      } else if (act === "prio") {
+        currentPothole = id;
+        document.getElementById("prioTarget").textContent = `${UTILS.esc(pothole.pothole_code)} &middot; current: ${UTILS.esc(pothole.priority)}`;
+        new bootstrap.Modal(document.getElementById("prioModal")).show();
+      }
+    }
+
+    async function actVerbose(fn) {
+      try { await fn(); UTILS.toast("Updated."); load(offset); }
+      catch (e) { UTILS.toast(e.message, "danger"); }
+    }
+
+    document.getElementById("assignBtn").addEventListener("click", async () => {
+      const teamId = parseInt(document.getElementById("teamSelect").value);
+      if (!teamId) { UTILS.toast("Select a team first.", "warning"); return; }
+      await actVerbose(() => API.post(`/potholes/${currentPothole}/assign`, {
+        team_id: teamId, deadline_days: parseInt(document.getElementById("deadlineDays").value) || 7,
+      }));
+      bootstrap.Modal.getInstance(document.getElementById("assignModal")).hide();
+    });
+
+    document.getElementById("prioBtn").addEventListener("click", async () => {
+      await actVerbose(() => API.post(`/potholes/${currentPothole}/prioritize`, {
+        priority: document.getElementById("prioSelect").value,
+        reason: document.getElementById("prioReason").value,
+      }));
+      bootstrap.Modal.getInstance(document.getElementById("prioModal")).hide();
+    });
+
+    function resetFilters() {
+      document.getElementById("searchBox").value = "";
+      document.getElementById("sevFilter").value = "";
+      document.getElementById("statusFilter").value = "";
+      document.getElementById("wardBox").value = "";
+      load(0);
+    }
+
+    loadTeams();
+    load(0);
+  </script>
+</body>
+</html>

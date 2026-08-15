@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Report a Pothole - RoadGuard AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/forms.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="container py-5" style="max-width: 980px;">
+    <div class="text-center mb-4">
+      <h4 class="mb-1"><i class="bi bi-camera-fill me-2 text-primary"></i>Report a Pothole</h4>
+      <p class="text-muted-sm">Upload a photo of the damaged road. AI will detect the pothole and estimate severity, area and repair cost.</p>
+    </div>
+
+    <!-- Step 1: Upload -->
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <div class="upload-zone" id="uploadZone">
+        <i class="bi bi-cloud-arrow-up"></i>
+        <div class="mt-2 fw-bold">Click to select or drag &amp; drop a road photo</div>
+        <div class="hint">JPG/PNG up to 10MB &middot; clear, close-up photos work best</div>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" hidden>
+      </div>
+      <div id="uploadError" class="mt-2"></div>
+    </div>
+
+    <!-- Step 2: Result -->
+    <div id="resultCard" class="card border-0 shadow-sm p-4 mb-4" style="display:none;">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="position-relative">
+            <img id="previewImg" class="img-preview" alt="Detected pothole">
+            <canvas id="bboxCanvas" class="bbox-canvas d-none"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <h6 class="mb-0">AI Analysis</h6>
+            <span class="badge bg-warning-subtle text-dark" id="demoBadge" style="display:none;"><i class="bi bi-lightning-charge-fill me-1"></i>Demo Mode</span>
+          </div>
+          <dl class="kv">
+            <dt>Detection</dt><dd id="rDetected">-</dd>
+            <dt>Confidence</dt><dd id="rConfidence">-</dd>
+            <dt>Severity (estimated)</dt><dd id="rSeverity">-</dd>
+            <dt>Estimated area</dt><dd id="rArea">-</dd>
+            <dt>Repair area</dt><dd id="rRepairArea">-</dd>
+            <dt>Est. repair cost</dt><dd id="rCost" class="num">-</dd>
+          </dl>
+          <div id="costBreakdown" class="small text-muted"></div>
+          <div class="alert alert-warning small mt-3 mb-0">
+            <i class="bi bi-exclamation-triangle me-1"></i>Estimates are preliminary, AI-assisted figures. Official engineering verification is required.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Location + submit -->
+    <div id="submitCard" class="card border-0 shadow-sm p-4" style="display:none;">
+      <h6 class="mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>Confirm Location</h6>
+      <p class="text-muted-sm">We use approximate GPS so officials can find the pothole. Your identity is never shown publicly.</p>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <label class="form-label" for="lat">Latitude</label>
+          <input class="form-control" id="lat" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="lon">Longitude</label>
+          <input class="form-control" id="lon" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="road">Road / street (optional)</label>
+          <input class="form-control" id="road" placeholder="e.g. MG Road">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="city">City (optional)</label>
+          <input class="form-control" id="city" placeholder="e.g. Pune">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="ward">Ward (optional)</label>
+          <input class="form-control" id="ward" placeholder="e.g. 15">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="note">Note (optional)</label>
+          <input class="form-control" id="note" placeholder="Anything else officials should know">
+        </div>
+        <div class="col-12 d-flex gap-2 flex-wrap">
+          <button class="btn btn-outline-primary" id="locateBtn"><i class="bi bi-crosshair me-1"></i>Use my location</button>
+          <button class="btn btn-brand px-4" id="submitBtn"><i class="bi bi-send me-1"></i>Submit Report</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div id="successCard" class="card border-0 shadow-sm p-5 text-center" style="display:none;">
+      <i class="bi bi-check-circle-fill text-success" style="font-size:3rem;"></i>
+      <h4 class="mt-3 mb-1">Report submitted</h4>
+      <p class="text-muted-sm">Your report has been registered.</p>
+      <div class="my-3">
+        <div id="dupAlert" style="display:none;" class="alert alert-warning mx-auto" style="max-width:520px;"></div>
+        <p id="potholeInfo" class="mb-0"></p>
+      </div>
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <a href="complaints.html" class="btn btn-outline-primary"><i class="bi bi-list-check me-1"></i>My Complaints</a>
+        <a href="report.html" class="btn btn-brand"><i class="bi bi-camera me-1"></i>Report Another</a>
+        <a href="map.html" class="btn btn-outline-secondary"><i class="bi bi-map me-1"></i>View Map</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    AUTH.requireAuth();
+    COMPONENTS.publicNavbar("report");
+    COMPONENTS.footer();
+
+    let analysis = null;
+
+    const zone = document.getElementById("uploadZone");
+    const input = document.getElementById("fileInput");
+    zone.addEventListener("click", () => input.click());
+    zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("dragover"); });
+    zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault(); zone.classList.remove("dragover");
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    input.addEventListener("change", () => input.files.length && handleFile(input.files[0]));
+
+    async function handleFile(file) {
+      if (!file.type.startsWith("image/")) { UTILS.toast("Please choose an image file.", "danger"); return; }
+      const errBox = document.getElementById("uploadError");
+      errBox.innerHTML = "";
+      const form = new FormData();
+      form.append("file", file);
+      zone.querySelector("i").className = "bi bi-hourglass-split";
+      zone.querySelector(".fw-bold").textContent = "Analyzing image...";
+      try {
+        const res = await API.upload("/reports/analyze", form);
+        analysis = res;
+        showResult(file, res);
+      } catch (e) {
+        errBox.innerHTML = `<div class="alert alert-danger py-2 small">${UTILS.esc(e.message)}</div>`;
+      }
+      zone.querySelector("i").className = "bi bi-cloud-arrow-up";
+      zone.querySelector(".fw-bold").textContent = "Click to select or drag &amp; drop a road photo";
+    }
+
+    function showResult(file, res) {
+      document.getElementById("previewImg").src = URL.createObjectURL(file);
+      document.getElementById("resultCard").style.display = "";
+      const demo = document.getElementById("demoBadge");
+      demo.style.display = res.demo_mode ? "" : "none";
+      document.getElementById("rDetected").innerHTML = res.detected
+        ? `<span class="text-success">Pothole detected</span>`
+        : `<span class="text-danger">No pothole detected</span>`;
+      document.getElementById("rConfidence").textContent = UTILS.confidencePct(res.confidence);
+      document.getElementById("rSeverity").innerHTML = UTILS.severityBadge(res.severity);
+      document.getElementById("rArea").textContent = UTILS.fmtNum(res.estimated_area, 2) + " m²";
+      document.getElementById("rRepairArea").textContent = UTILS.fmtNum(res.repair_area, 2) + " m²";
+      document.getElementById("rCost").textContent = UTILS.fmtINR(res.estimated_cost);
+      const cb = res.repair_cost_breakdown || {};
+      const breakdownLines = [
+        ["Material", cb.material], ["Labour", cb.labor], ["Equipment", cb.equipment],
+        ["Transport", cb.transport], ["Contingency", cb.contingency],
+      ].filter(([, v]) => v !== undefined);
+      document.getElementById("costBreakdown").innerHTML = breakdownLines.length
+        ? breakdownLines.map(([l, v]) => `${l}: <strong>${UTILS.fmtINR(v)}</strong>`).join(" &middot; ")
+        : "";
+
+      if (res.detected) {
+        document.getElementById("submitCard").style.display = "";
+        document.getElementById("submitCard").scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    // Location
+    function setLocation(lat, lon) {
+      document.getElementById("lat").value = lat.toFixed(6);
+      document.getElementById("lon").value = lon.toFixed(6);
+    }
+
+    document.getElementById("locateBtn").addEventListener("click", () => {
+      if (!navigator.geolocation) { UTILS.toast("Geolocation is not supported.", "danger"); return; }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { setLocation(pos.coords.latitude, pos.coords.longitude); UTILS.toast("Location captured."); },
+        () => { UTILS.toast("Could not get GPS. Enter coordinates manually?", "warning"); },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const lat = parseFloat(document.getElementById("lat").value);
+      const lon = parseFloat(document.getElementById("lon").value);
+      if (isNaN(lat) || isNaN(lon)) { UTILS.toast("Capture your location first (use 'Use my location').", "warning"); return; }
+      if (!analysis || !analysis.detected) { UTILS.toast("Analyze an image first.", "warning"); return; }
+
+      const btn = document.getElementById("submitBtn");
+      UTILS.spinnerButton(btn, true, "Submitting...");
+      try {
+        const res = await API.post("/reports", {
+          latitude: lat,
+          longitude: lon,
+          road: document.getElementById("road").value.trim(),
+          city: document.getElementById("city").value.trim(),
+          ward: document.getElementById("ward").value.trim(),
+          note: document.getElementById("note").value.trim(),
+        });
+
+        document.getElementById("submitCard").style.display = "none";
+        document.getElementById("resultCard").style.display = "none";
+        document.getElementById("uploadZone").closest(".card").style.display = "none";
+        const success = document.getElementById("successCard");
+        success.style.display = "";
+
+        const dup = document.getElementById("dupAlert");
+        if (res.duplicate) {
+          dup.style.display = "";
+          dup.innerHTML = `<i class="bi bi-copy me-1"></i>This appears to be a <strong>duplicate</strong> of an existing pothole (${UTILS.esc(res.pothole && res.pothole.pothole_code ? res.pothole.pothole_code : "")}). Your report was attached to it.`;
+        }
+        document.getElementById("potholeInfo").innerHTML = res.pothole
+          ? `<p class="mb-1">Pothole code: <strong>${UTILS.esc(res.pothole.pothole_code)}</strong></p>
+             <p class="text-muted-sm mb-0">Severity: ${UTILS.severityBadge(res.pothole.severity)} &middot; Status: ${UTILS.statusBadge(res.pothole.status)}</p>`
+          : `<p class="text-muted-sm">Report code: <strong>${UTILS.esc(res.report.report_code)}</strong></p>`;
+        success.scrollIntoView({ behavior: "smooth" });
+      } catch (e) { UTILS.toast(e.message, "danger"); }
+      UTILS.spinnerButton(btn, false);
+    });
+  </script>
+</body>
+</html>

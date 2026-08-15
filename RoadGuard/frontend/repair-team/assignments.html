@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assignments - RoadGuard AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/dashboard.css" rel="stylesheet">
+  <link href="../css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div class="dash-wrap">
+    <div id="sidebar"></div>
+    <div class="dash-main">
+      <div class="dash-topbar">
+        <button class="btn btn-sm btn-light d-lg-none" onclick="document.getElementById('rgSidebar').classList.toggle('open')"><i class="bi bi-list"></i></button>
+        <h5 id="pageTitle">Assignments</h5>
+        <div class="d-flex align-items-center gap-3">
+          <a href="/notifications.html" class="text-muted"><i class="bi bi-bell fs-5"></i></a>
+          <span class="badge bg-primary" id="topbarUser"></span>
+        </div>
+      </div>
+      <div class="dash-content">
+        <div class="filter-bar mb-3">
+          <select class="form-select form-select-sm w-auto" id="statusFilter">
+            <option value="">All statuses</option>
+            <option>ASSIGNED</option><option>IN_PROGRESS</option><option>COMPLETED</option><option>CITIZEN_VERIFICATION</option><option>CLOSED</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="load()"><i class="bi bi-search me-1"></i>Apply</button>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="table-responsive">
+            <table class="table rg-table align-middle mb-0">
+              <thead><tr>
+                <th>Pothole</th><th>Road</th><th>Severity</th><th>Status</th><th>Deadline</th><th>Cost</th><th style="min-width:240px;">Actions</th>
+              </tr></thead>
+              <tbody id="repairBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress modal -->
+  <div class="modal fade" id="progressModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title">Update Progress</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Note</label><textarea class="form-control" id="progressNote" rows="2"></textarea></div>
+        <div class="mb-3"><label class="form-label">Photo (optional)</label><input type="file" class="form-control" id="progressFile" accept="image/*"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-brand" id="progressBtn">Post Update</button></div>
+    </div></div>
+  </div>
+
+  <!-- Complete modal -->
+  <div class="modal fade" id="completeModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title">Complete Repair</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Actual cost (INR)</label><input type="number" class="form-control" id="actualCost" step="any"></div>
+        <div class="mb-3"><label class="form-label">Note</label><textarea class="form-control" id="completeNote" rows="2"></textarea></div>
+        <div class="mb-3"><label class="form-label">After photo</label><input type="file" class="form-control" id="completeFile" accept="image/*"></div>
+        <div class="alert alert-warning small">Submitting will mark the pothole as completed and notify the government for citizen verification.</div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-brand" id="completeBtn">Complete Repair</button></div>
+    </div></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    if (!AUTH.requireAuth(["REPAIR_TEAM"])) throw new Error();
+    COMPONENTS.demoBanner();
+    COMPONENTS.sidebar([
+      { key: "dashboard", href: "dashboard.html", icon: "bi-speedometer2", label: "Dashboard" },
+      { key: "assignments", href: "assignments.html", icon: "bi-clipboard-check", label: "Assignments" },
+    ], "assignments");
+
+    let currentRepair = null;
+
+    async function load() {
+      UTILS.showLoading("repairBody");
+      try {
+        const status = document.getElementById("statusFilter").value;
+        const q = status ? "?status=" + status : "";
+        const rows = await API.get("/repairs" + q);
+        const body = document.getElementById("repairBody");
+        if (!rows.length) { UTILS.emptyState("repairBody", "No repairs found"); return; }
+        body.innerHTML = rows.map((r) => {
+          const p = r.pothole || {};
+          const buttons = [];
+          if (r.status === "ASSIGNED" || r.status === "SCHEDULED") buttons.push(`<button class="btn btn-sm btn-brand" data-act="accept" data-id="${r.id}">Accept</button>`);
+          if (r.status === "ASSIGNED") buttons.push(`<button class="btn btn-sm btn-outline-primary" data-act="start" data-id="${r.id}">Start Work</button>`);
+          if (r.status === "IN_PROGRESS") buttons.push(
+            `<button class="btn btn-sm btn-outline-secondary" data-act="progress" data-id="${r.id}">Progress</button>`,
+            `<button class="btn btn-sm btn-success" data-act="complete" data-id="${r.id}">Complete</button>`);
+          return `<tr>
+            <td class="fw-bold">${UTILS.esc(p.pothole_code || "-")}</td>
+            <td>${UTILS.esc(p.road || "-")}</td>
+            <td>${UTILS.severityBadge(p.severity)}</td>
+            <td>${UTILS.statusBadge(r.status)}</td>
+            <td class="text-muted-sm">${UTILS.fmtDate(r.deadline)}</td>
+            <td class="num">${UTILS.fmtINR(r.estimated_cost)}</td>
+            <td><div class="d-flex flex-wrap gap-1">${buttons.join("")}</div></td>
+          </tr>`;
+        }).join("");
+        body.querySelectorAll("[data-act]").forEach((btn) => btn.addEventListener("click", () => onAction(btn.dataset.act, btn.dataset.id)));
+      } catch (e) { UTILS.errorState("repairBody", e.message); }
+    }
+
+    async function onAction(act, id) {
+      currentRepair = id;
+      try {
+        if (act === "accept") { await API.post(`/repairs/${id}/accept`); UTILS.toast("Accepted."); load(); }
+        else if (act === "start") { await API.post(`/repairs/${id}/start`); UTILS.toast("Work started."); load(); }
+        else if (act === "progress") new bootstrap.Modal(document.getElementById("progressModal")).show();
+        else if (act === "complete") new bootstrap.Modal(document.getElementById("completeModal")).show();
+      } catch (e) { UTILS.toast(e.message, "danger"); }
+    }
+
+    document.getElementById("progressBtn").addEventListener("click", async () => {
+      const form = new FormData();
+      form.append("note", document.getElementById("progressNote").value || "Progress update");
+      const file = document.getElementById("progressFile").files[0];
+      if (file) form.append("file", file);
+      const btn = document.getElementById("progressBtn");
+      UTILS.spinnerButton(btn, true, "Posting...");
+      try { await API.upload(`/repairs/${currentRepair}/progress`, form); UTILS.toast("Progress posted."); load(); }
+      catch (e) { UTILS.toast(e.message, "danger"); }
+      UTILS.spinnerButton(btn, false);
+      bootstrap.Modal.getInstance(document.getElementById("progressModal")).hide();
+    });
+
+    document.getElementById("completeBtn").addEventListener("click", async () => {
+      const cost = parseFloat(document.getElementById("actualCost").value);
+      if (isNaN(cost)) { UTILS.toast("Enter the actual cost.", "warning"); return; }
+      const form = new FormData();
+      form.append("actual_cost", String(cost));
+      form.append("note", document.getElementById("completeNote").value || "Repair completed");
+      const file = document.getElementById("completeFile").files[0];
+      if (file) form.append("file", file);
+      const btn = document.getElementById("completeBtn");
+      UTILS.spinnerButton(btn, true, "Submitting...");
+      try { await API.upload(`/repairs/${currentRepair}/complete`, form); UTILS.toast("Repair completed."); load(); }
+      catch (e) { UTILS.toast(e.message, "danger"); }
+      UTILS.spinnerButton(btn, false);
+      bootstrap.Modal.getInstance(document.getElementById("completeModal")).hide();
+    });
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Public Road Map - RoadGuard AI</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/map.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <div class="map-page">
+    <div class="map-filters">
+      <div class="container d-flex flex-wrap gap-2 align-items-center py-3">
+        <div class="me-auto">
+          <h5 class="mb-0"><i class="bi bi-map me-2 text-primary"></i>Public Pothole Map</h5>
+          <div class="text-muted-sm">Approximate locations. Citizen details are never shown publicly.</div>
+        </div>
+        <select class="form-select form-select-sm w-auto" id="sevFilter">
+          <option value="">All severities</option>
+          <option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option>
+        </select>
+        <select class="form-select form-select-sm w-auto" id="statusFilter">
+          <option value="">All statuses</option>
+        </select>
+        <button class="btn btn-outline-primary btn-sm" onclick="refreshMap()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+      </div>
+    </div>
+    <div id="map" class="map-canvas"></div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    COMPONENTS.demoBanner();
+    COMPONENTS.publicNavbar("map");
+    COMPONENTS.footer();
+
+    const STATUSES = ["SUBMITTED","AI_ANALYZED","PENDING_VERIFICATION","VERIFIED","PRIORITIZED","ASSIGNED","IN_PROGRESS","COMPLETED","CITIZEN_VERIFICATION","CLOSED","REJECTED"];
+    const sevColors = { LOW: "#22c55e", MEDIUM: "#eab308", HIGH: "#f97316", CRITICAL: "#dc2626" };
+
+    const statusSel = document.getElementById("statusFilter");
+    STATUSES.forEach((s) => statusSel.insertAdjacentHTML("beforeend", `<option>${s}</option>`));
+
+    const map = L.map("map").setView([28.6139, 77.2090], 12);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19, attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    let layer = L.layerGroup().addTo(map);
+
+    async function refreshMap() {
+      try {
+        const params = new URLSearchParams();
+        const sev = document.getElementById("sevFilter").value;
+        const status = document.getElementById("statusFilter").value;
+        if (sev) params.set("severity", sev);
+        if (status) params.set("status", status);
+        const data = await API.get("/map/potholes?" + params.toString(), { auth: false });
+        layer.clearLayers();
+        const features = data.features || [];
+        if (!features.length) {
+          L.popup().setLatLng(map.getCenter()).setContent("No potholes match the selected filters.").openOn(map);
+        }
+        features.forEach((f) => {
+          const p = f.properties;
+          const [lon, lat] = f.geometry.coordinates;
+          const color = sevColors[p.severity] || "#64748b";
+          const marker = L.circleMarker([lat, lon], {
+            radius: 8, color: "#fff", weight: 2, fillColor: color, fillOpacity: 0.9,
+          });
+          marker.bindPopup(`
+            <strong>${UTILS.esc(p.code)}</strong><br>
+            <span>${UTILS.severityBadge(p.severity)}</span><br>
+            <span class="text-muted-sm">${UTILS.esc(p.road || "-")} &middot; Ward ${UTILS.esc(p.ward || "-")}</span><br>
+            <span class="text-muted-sm">Est. area: ${UTILS.fmtNum(p.estimated_area, 2)} m&sup2;</span><br>
+            <span class="text-muted-sm">Est. cost: ${UTILS.fmtINR(p.estimated_cost)}</span><br>
+            ${UTILS.statusBadge(p.status)}`);
+          marker.addTo(layer);
+        });
+        if (features.length) map.fitBounds(layer.getBounds(), { padding: [40, 40] });
+      } catch (e) {
+        UTILS.toast(e.message, "danger");
+      }
+    }
+
+    document.getElementById("sevFilter").addEventListener("change", refreshMap);
+    document.getElementById("statusFilter").addEventListener("change", refreshMap);
+    refreshMap();
+  </script>
+</body>
+</html>

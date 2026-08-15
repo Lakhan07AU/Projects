@@ -1,0 +1,27 @@
+/* RoadGuard AI - map pages */
+
+.map-page { height: calc(100vh - 56px); display: flex; flex-direction: column; }
+#map { flex: 1; min-height: 420px; z-index: 1; }
+.map-toolbar {
+  background: #fff; border-bottom: 1px solid var(--rg-border);
+  padding: .7rem 1rem;
+  display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+}
+.map-legend {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  padding: .7rem .9rem;
+  font-size: .8rem;
+  z-index: 2;
+}
+.map-legend .row-item { display: flex; align-items: center; gap: .45rem; margin-bottom: .25rem; }
+.map-legend .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.dot-low { background: #22c55e; }
+.dot-medium { background: #f59e0b; }
+.dot-high { background: #f97316; }
+.dot-critical { background: #dc2626; }
+.dot-repaired { background: #16a34a; outline: 3px solid #86efac; }
+
+.leaflet-popup-content h6 { margin: 0 0 .3rem; color: var(--rg-primary); font-weight: 800; }
+.leaflet-popup-content p { margin: 0 0 .2rem; font-size: .8rem; }

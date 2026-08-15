@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RoadGuard AI - Making Every Road Safer with AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <header class="hero">
+    <div class="container">
+      <div class="tagline mb-2">DETECT &middot; REPORT &middot; PRIORITIZE &middot; REPAIR</div>
+      <h1>Making Every Road Safer with AI</h1>
+      <p class="lead mx-auto mt-3" style="max-width:640px;">
+        Report potholes with a single photo. Our AI detects damage, estimates severity
+        and repair costs, and routes the work to the right repair team automatically.
+      </p>
+      <div class="mt-4 d-flex flex-wrap justify-content-center gap-2">
+        <a href="report.html" class="btn btn-light btn-lg px-4"><i class="bi bi-camera-fill me-2"></i>Report a Pothole</a>
+        <a href="map.html" class="btn btn-outline-light btn-lg px-4"><i class="bi bi-map me-2"></i>Explore Road Conditions</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container stat-strip">
+    <div class="row g-3">
+      <div class="col-6 col-md-3"><div class="card stat"><div class="stat-num" id="stTotal">-</div><div class="stat-label">Total Reported</div></div></div>
+      <div class="col-6 col-md-3"><div class="card stat"><div class="stat-num" id="stRepaired">-</div><div class="stat-label">Repaired</div></div></div>
+      <div class="col-6 col-md-3"><div class="card stat"><div class="stat-num" id="stCritical">-</div><div class="stat-label">Critical Potholes</div></div></div>
+      <div class="col-6 col-md-3"><div class="card stat"><div class="stat-num" id="stRate">-</div><div class="stat-label">Repair Completion Rate</div></div></div>
+    </div>
+  </div>
+
+  <section class="py-5">
+    <div class="container">
+      <h2 class="section-title text-center">How RoadGuard AI Works</h2>
+      <p class="section-sub text-center mb-4">A complete citizen-to-repair pipeline</p>
+      <div class="row g-3 text-center">
+        <div class="col-md-3"><div class="card h-100 border-0 shadow-sm p-3"><i class="bi bi-cloud-arrow-up fs-1 text-primary"></i><h6 class="mt-2 fw-bold">1. Capture</h6><p class="text-muted-sm mb-0">Upload or click a photo of the damaged road.</p></div></div>
+        <div class="col-md-3"><div class="card h-100 border-0 shadow-sm p-3"><i class="bi bi-cpu fs-1 text-primary"></i><h6 class="mt-2 fw-bold">2. AI Analysis</h6><p class="text-muted-sm mb-0">Computer vision detects potholes, severity and estimated area.</p></div></div>
+        <div class="col-md-3"><div class="card h-100 border-0 shadow-sm p-3"><i class="bi bi-geo-alt fs-1 text-primary"></i><h6 class="mt-2 fw-bold">3. Locate &amp; Report</h6><p class="text-muted-sm mb-0">GPS is captured, a complaint is auto-registered and duplicates are merged.</p></div></div>
+        <div class="col-md-3"><div class="card h-100 border-0 shadow-sm p-3"><i class="bi bi-tools fs-1 text-primary"></i><h6 class="mt-2 fw-bold">4. Repair</h6><p class="text-muted-sm mb-0">Government prioritizes, assigns a team, and AI verifies the repair.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5 bg-white border-top">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <h2 class="section-title">AI Detection, Explained Honestly</h2>
+          <p class="text-muted">Every detection is labelled clearly:</p>
+          <ul class="list-unstyled">
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Estimated</strong> area (never claimed as exact)</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>AI-assisted preliminary</strong> cost estimates from real rates</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Demo Mode</strong> clearly flagged when results are simulated</li>
+            <li class="mb-2"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Official engineering verification is always required</li>
+          </ul>
+          <a href="map.html" class="btn btn-brand mt-2"><i class="bi bi-map me-2"></i>View Public Road Map</a>
+        </div>
+        <div class="col-lg-6">
+          <div class="rg-card">
+            <div class="card-head"><i class="bi bi-newspaper text-primary"></i>Recent Reports</div>
+            <div class="card-body p-0" id="recentReports"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5">
+    <div class="container">
+      <h2 class="section-title text-center">Repair Progress</h2>
+      <div class="row g-3 mt-2">
+        <div class="col-lg-6">
+          <div class="rg-card">
+            <div class="card-head"><i class="bi bi-bar-chart-fill text-primary"></i>Statistics</div>
+            <div class="card-body">
+              <canvas id="homeChart" height="120"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="rg-card h-100">
+            <div class="card-head"><i class="bi bi-info-circle text-primary"></i>About the Project</div>
+            <div class="card-body">
+              <p>RoadGuard AI is a full-stack road-infrastructure management platform:</p>
+              <ul>
+                <li>Computer vision pothole detection with severity &amp; area estimation</li>
+                <li>Automatic complaint registration with GPS + duplicate detection</li>
+                <li>Deterministic repair-cost estimation from configurable rates</li>
+                <li>Government dashboard with analytics, priority &amp; road health</li>
+                <li>Repair-team workflow with before/after AI verification</li>
+                <li>GenAI repair reports and a government analytics assistant</li>
+              </ul>
+              <p class="text-muted-sm mb-0">Built with FastAPI, PostgreSQL/PostGIS, vanilla JS, Bootstrap 5, Chart.js and Leaflet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    COMPONENTS.demoBanner();
+    COMPONENTS.publicNavbar("home");
+    COMPONENTS.footer();
+
+    async function loadStats() {
+      try {
+        const s = await API.get("/public/stats");
+        document.getElementById("stTotal").textContent = s.total_potholes.toLocaleString("en-IN");
+        document.getElementById("stRepaired").textContent = s.repaired.toLocaleString("en-IN");
+        document.getElementById("stCritical").textContent = s.critical_potholes.toLocaleString("en-IN");
+        document.getElementById("stRate").textContent = s.repair_completion_rate + "%";
+
+        new Chart(document.getElementById("homeChart"), {
+          type: "doughnut",
+          data: {
+            labels: ["Repaired", "Pending / In Progress"],
+            datasets: [{
+              data: [s.repaired, Math.max(0, s.total_potholes - s.repaired)],
+              backgroundColor: ["#16a34a", "#f59e0b"],
+            }],
+          },
+          options: { plugins: { legend: { position: "bottom" } } },
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadRecent() {
+      const el = document.getElementById("recentReports");
+      try {
+        const rows = await API.get("/public/recent");
+        if (!rows.length) { el.innerHTML = `<div class="p-4 text-muted text-center">No reports yet.</div>`; return; }
+        el.innerHTML = rows.map((r) => `
+          <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+            <div>
+              <strong>${UTILS.esc(r.code)}</strong>
+              <span class="text-muted-sm ms-2">${UTILS.esc(r.road)} &middot; Ward ${UTILS.esc(r.ward)}</span>
+            </div>
+            <div class="text-end">
+              ${UTILS.severityBadge(r.severity)}
+              <div class="text-muted-sm">${UTILS.fmtDate(r.created_at)}</div>
+            </div>
+          </div>`).join("");
+      } catch (e) { UTILS.errorState("recentReports", "Could not load recent reports."); }
+    }
+
+    loadStats();
+    loadRecent();
+  </script>
+</body>
+</html>

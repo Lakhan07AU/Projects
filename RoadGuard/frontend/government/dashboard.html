@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Government Dashboard - RoadGuard AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/dashboard.css" rel="stylesheet">
+  <link href="../css/responsive.css" rel="stylesheet">
+</head>
+<body>
+  <div class="dash-wrap">
+    <div id="sidebar"></div>
+    <div class="dash-main">
+      <div class="dash-topbar">
+        <button class="btn btn-sm btn-light d-lg-none" onclick="document.getElementById('rgSidebar').classList.toggle('open')"><i class="bi bi-list"></i></button>
+        <h5 id="pageTitle">Dashboard</h5>
+        <div class="d-flex align-items-center gap-3">
+          <a href="/notifications.html" class="text-muted"><i class="bi bi-bell fs-5"></i></a>
+          <span class="badge bg-primary" id="topbarUser"></span>
+        </div>
+      </div>
+      <div class="dash-content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <div>
+            <h5 class="mb-0 fw-bold">Road Health Overview</h5>
+            <div class="text-muted-sm">Live statistics from verified reports</div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm" onclick="loadStats()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+        </div>
+
+        <div class="row g-3" id="statCards"></div>
+
+        <div class="row g-3 mt-1">
+          <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2 text-primary"></i>Severity Distribution</h6>
+                <canvas id="severityChart" height="230"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>Ward Summary</h6>
+                <div id="wardList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    if (!AUTH.requireAuth(["GOVERNMENT_OFFICIAL", "ADMIN"])) throw new Error();
+    COMPONENTS.demoBanner();
+    COMPONENTS.sidebar([
+      { key: "dashboard", href: "dashboard.html", icon: "bi-speedometer2", label: "Dashboard" },
+      { key: "potholes", href: "potholes.html", icon: "bi-exclamation-diamond", label: "Potholes" },
+      { key: "repairs", href: "repairs.html", icon: "bi-tools", label: "Repairs" },
+      { key: "analytics", href: "analytics.html", icon: "bi-bar-chart", label: "Analytics" },
+      { key: "costrates", href: "cost-rates.html", icon: "bi-cash-coin", label: "Cost Rates" },
+      { key: "users", href: "users.html", icon: "bi-people", label: "Users" },
+    ], "dashboard");
+
+    const ICON_STYLE = { blue: "icon-blue", red: "icon-red", amber: "icon-amber", purple: "icon-purple", green: "icon-green", slate: "icon-slate" };
+    const CARD_META = {
+      total: { icon: "bi-exclamation-diamond", cls: "icon-red" },
+      critical: { icon: "bi-bullseye", cls: "icon-red" },
+      pending: { icon: "bi-hourglass-split", cls: "icon-amber" },
+      in_progress: { icon: "bi-tools", cls: "icon-blue" },
+      completed: { icon: "bi-check-circle", cls: "icon-green" },
+      budget: { icon: "bi-cash-coin", cls: "icon-purple" },
+      actual: { icon: "bi-coin", cls: "icon-green" },
+      avg_time: { icon: "bi-clock-history", cls: "icon-slate" },
+    };
+
+    let chart = null;
+
+    async function loadStats() {
+      UTILS.showLoading("statCards");
+      try {
+        const data = await API.get("/dashboard/statistics");
+        document.getElementById("statCards").innerHTML = data.cards.map((c) => {
+          const meta = CARD_META[c.key] || { icon: "bi-graph-up", cls: "icon-blue" };
+          const value = c.key === "budget" || c.key === "actual" ? UTILS.fmtINR(c.value) : UTILS.fmtNum(c.value, c.suffix?.includes("days") ? 1 : 0);
+          return `<div class="col-6 col-xl-3">
+            <div class="stat-card">
+              <div class="icon ${meta.cls}"><i class="bi ${meta.icon}"></i></div>
+              <div><div class="stat-label">${UTILS.esc(c.label)}</div><div class="stat-value num">${value}</div></div>
+            </div></div>`;
+        }).join("");
+
+        const sev = await API.get("/dashboard/severity");
+        const labels = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
+        const colors = ["#22c55e", "#eab308", "#f97316", "#dc2626"];
+        if (chart) chart.destroy();
+        chart = new Chart(document.getElementById("severityChart"), {
+          type: "doughnut",
+          data: {
+            labels,
+            datasets: [{ data: labels.map((l) => sev.find((s) => s.severity === l)?.count || 0), backgroundColor: colors }],
+          },
+          options: { plugins: { legend: { position: "bottom" } } },
+        });
+
+        const wards = await API.get("/dashboard/wards");
+        const list = document.getElementById("wardList");
+        if (!wards.length) {
+          list.innerHTML = `<div class="empty-state"><i class="bi bi-inbox"></i><strong>No data</strong><div class="text-muted-sm">Seed the database to see ward statistics.</div></div>`;
+        } else {
+          const max = Math.max(...wards.map((w) => w.count), 1);
+          list.innerHTML = wards.sort((a, b) => b.count - a.count).slice(0, 8).map((w) => `
+            <div class="mb-2">
+              <div class="d-flex justify-content-between small mb-1">
+                <strong>Ward ${UTILS.esc(w.ward)}</strong><span class="text-muted-sm">${w.count} &middot; ${UTILS.fmtINR(w.estimated_cost)}</span>
+              </div>
+              <div class="progress" style="height:6px;"><div class="progress-bar" style="width:${(w.count / max) * 100}%"></div></div>
+            </div>`).join("");
+        }
+      } catch (e) { UTILS.errorState("statCards", e.message); }
+    }
+
+    loadStats();
+  </script>
+</body>
+</html>
