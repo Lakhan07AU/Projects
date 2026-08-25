@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+.next/
+out/
+.turbo/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Data
+data/
+!data/.gitkeep
+
+# Alembic
+apps/api/alembic/versions/__pycache__/
+
+# Misc
+.DS_Store
+*.log
+coverage.json
+htmlcov/

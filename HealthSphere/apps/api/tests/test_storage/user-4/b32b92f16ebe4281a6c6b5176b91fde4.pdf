@@ -1,0 +1,38 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 505 >>
+stream
+BT /F1 11 Tf 40 750 Td (Sunrise Diagnostics Laboratory) Tj ET
+BT /F1 11 Tf 40 734 Td (Lab Report Date: 2026-08-20) Tj ET
+BT /F1 11 Tf 40 718 Td (Patient Name: Demo Patient) Tj ET
+BT /F1 11 Tf 40 702 Td (HbA1c  6.8 %   \(Reference: 4.0 - 5.6 %\)) Tj ET
+BT /F1 11 Tf 40 686 Td (Total Cholesterol  230 mg/dL \(Reference: 120 - 200 mg/dL\)) Tj ET
+BT /F1 11 Tf 40 670 Td (HDL Cholesterol 38 mg/dL \(Reference: 40 - 60 mg/dL\)) Tj ET
+BT /F1 11 Tf 40 654 Td (TSH 2.1 uIU/mL \(Reference: 0.4 - 4.0 uIU/mL\)) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000797 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+867
+%%EOF
