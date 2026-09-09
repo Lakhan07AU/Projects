@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A journey through your beautiful life — Happy Birthday!" />
+  <title>A Journey Through Your Life ❤️</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+
+  <!-- Icons (CDN) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+</head>
+
+<body class="page-loading">
+
+  <!-- ===== THUNDER FLASH ===== -->
+  <div class="thunder-flash" id="thunderFlash" aria-hidden="true"></div>
+
+  <!-- ===== CUSTOM CURSOR ===== -->
+  <div class="cursor" id="cursor" aria-hidden="true">
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+  </div>
+
+  <!-- ===== PRELOADER ===== -->
+  <div id="preloader" role="status" aria-label="Loading your journey...">
+    <p class="preloader-title">Loading your journey...</p>
+    <div class="preloader-bar-wrap">
+      <div class="preloader-bar" id="preloaderBar"></div>
+    </div>
+    <p class="preloader-count" id="preloaderCount">0%</p>
+  </div>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <div class="lightbox-inner">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close photo">✕</button>
+      <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous">‹</button>
+      <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next">›</button>
+      <img id="lightboxImg" src="" alt="" />
+      <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
+  </div>
+
+  <!-- ===== FESTIVAL MODAL ===== -->
+  <div id="festivalModal" class="festival-modal" role="dialog" aria-modal="true">
+    <div class="festival-modal-bg" id="festivalModalBg"></div>
+    <div class="festival-modal-content">
+      <button class="festival-modal-close" id="festivalModalClose" aria-label="Close">✕</button>
+      <div id="festivalModalInner"></div>
+    </div>
+  </div>
+
+  <!-- ===== GIFT REVEAL POPUP ===== -->
+  <div id="giftPopup" class="gift-reveal-popup" role="dialog" aria-modal="true">
+    <div class="gift-reveal-bg" id="giftPopupBg"></div>
+    <div class="gift-reveal-content">
+      <div class="gift-reveal-icon" id="giftIcon">🎁</div>
+      <h3 class="gift-reveal-title" id="giftTitle">A Secret For You</h3>
+      <p class="gift-reveal-text" id="giftText">Your surprise is inside...</p>
+      <button class="btn-ghost" id="giftClose">Close ✕</button>
+    </div>
+  </div>
+
+  <!-- ===== AUDIO CONTROLS ===== -->
+  <div id="audio-controls" aria-label="Audio controls">
+    <button class="audio-btn" id="muteBtn" aria-label="Toggle mute">
+      <i class="fa-solid fa-volume-high" id="muteIcon"></i>
+    </button>
+    <div class="audio-visualizer" id="audioVisualizer">
+      <div class="audio-bar" style="height:8px"></div>
+      <div class="audio-bar" style="height:14px"></div>
+      <div class="audio-bar" style="height:6px"></div>
+      <div class="audio-bar" style="height:16px"></div>
+      <div class="audio-bar" style="height:10px"></div>
+    </div>
+    <button class="audio-btn" id="prevTrackBtn" aria-label="Previous track">
+      <i class="fa-solid fa-backward-step"></i>
+    </button>
+    <button class="audio-btn" id="nextTrackBtn" aria-label="Next track">
+      <i class="fa-solid fa-forward-step"></i>
+    </button>
+  </div>
+
+  <!-- ===== NAV DOTS ===== -->
+  <nav id="nav-dots" aria-label="Page navigation">
+    <a class="nav-dot active" href="#section-intro"      data-label="Portal"      aria-label="Go to Portal"></a>
+    <a class="nav-dot"        href="#section-childhood"  data-label="Childhood"   aria-label="Go to Childhood"></a>
+    <a class="nav-dot"        href="#section-family"     data-label="Family"      aria-label="Go to Family"></a>
+    <a class="nav-dot"        href="#section-festivals"  data-label="Festivals"   aria-label="Go to Festivals"></a>
+    <a class="nav-dot"        href="#section-school"     data-label="School"      aria-label="Go to School"></a>
+    <a class="nav-dot"        href="#section-college"    data-label="College"     aria-label="Go to College"></a>
+    <a class="nav-dot"        href="#section-struggle"   data-label="Hard Times"  aria-label="Go to Hard Times"></a>
+    <a class="nav-dot"        href="#section-loneliness" data-label="Loneliness"  aria-label="Go to Loneliness"></a>
+    <a class="nav-dot"        href="#section-success"    data-label="Success"     aria-label="Go to Success"></a>
+    <a class="nav-dot"        href="#section-theater"    data-label="Theater"     aria-label="Go to Theater"></a>
+    <a class="nav-dot"        href="#section-gifts"      data-label="Gifts"       aria-label="Go to Gifts"></a>
+    <a class="nav-dot"        href="#section-wishes"     data-label="Wishes"      aria-label="Go to Wishes"></a>
+    <a class="nav-dot"        href="#section-final"      data-label="Finale"      aria-label="Go to Finale"></a>
+  </nav>
+
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <main>
+
+    <!-- ====================================================
+         INTRO — THE PORTAL
+         ==================================================== -->
+    <section id="section-intro" class="section" data-section="0" data-audio="intro" style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+
+      <!-- Star field -->
+      <div class="star-field" id="starField" aria-hidden="true"></div>
+
+      <!-- Particles canvas -->
+      <canvas class="particles-canvas" id="introCanvas" aria-hidden="true"></canvas>
+
+      <div class="intro-content section-inner">
+        <p class="intro-tagline">For my forever person ✦ A journey of her beautiful life</p>
+
+        <h1 class="intro-headline">
+          A Journey Through<br />
+          <em>Your Beautiful Life</em>
+        </h1>
+
+        <p class="intro-sub">"Some people enter our lives… but only a few become our forever home."</p>
+
+        <!-- The Magic Door -->
+        <div class="magic-door-wrap" id="magicDoorWrap">
+          <div class="magic-door" id="magicDoor" role="button" tabindex="0" aria-label="Open the journey">
+            <div class="door-glow"></div>
+            <div class="door-frame"></div>
+            <div class="door-panel">
+              <div class="door-keyhole">🗝️</div>
+            </div>
+            <div class="door-light"></div>
+          </div>
+        </div>
+
+        <button class="btn-primary btn-open-door" id="btnOpenDoor" aria-label="Begin the journey">
+          <i class="fa-solid fa-door-open"></i>
+          Open My Journey
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 1 — CHILDHOOD
+         ==================================================== -->
+    <section id="section-childhood" class="section" data-section="1" data-audio="childhood">
+
+      <div class="childhood-sky" aria-hidden="true"></div>
+      <div class="childhood-grass" aria-hidden="true"></div>
+
+      <!-- Butterflies -->
+      <span class="butterfly" style="--dur:9s;--delay:0s;left:5%;top:30%;" aria-hidden="true">🦋</span>
+      <span class="butterfly" style="--dur:12s;--delay:2s;left:70%;top:20%;" aria-hidden="true">🦋</span>
+      <span class="butterfly" style="--dur:7s;--delay:4s;left:85%;top:50%;" aria-hidden="true">🦋</span>
+
+      <!-- Balloons rising -->
+      <span class="balloon" style="--dur:12s;--delay:0s;left:10%;" aria-hidden="true">🎈</span>
+      <span class="balloon" style="--dur:15s;--delay:3s;left:30%;" aria-hidden="true">🎀</span>
+      <span class="balloon" style="--dur:10s;--delay:6s;left:70%;" aria-hidden="true">🎈</span>
+      <span class="balloon" style="--dur:14s;--delay:8s;left:85%;" aria-hidden="true">🎈</span>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter One</p>
+        <h2 class="section-title text-gradient-rose reveal">
+          The Little <em>Wonder</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">
+          "वो छोटे हाथ जो कभी मेरी उंगली पकड़ते थे...<br/>
+          आज हमारे पूरे परिवार का सहारा बन गये।"<br/>
+          <span style="font-size:0.8em; color:rgba(255,255,255,0.45); font-family:var(--font-body);">
+            "Those tiny hands that once held my finger...<br/>became the greatest support of our entire family."
+          </span>
+        </p>
+
+        <!-- Rope photo gallery -->
+        <div class="rope-gallery" id="childhoodGallery" role="list" aria-label="Childhood photos">
+          <!-- Photos generated by JS / add your own -->
+          <div class="photo-rope-wrap reveal" style="--delay:0.2s" role="listitem">
+            <div class="photo-rope"></div>
+            <div class="photo-polaroid" data-lightbox data-src="" data-caption="When you first smiled ☀️">
+              <div class="photo-placeholder" style="width:180px;height:180px;min-height:180px;border-radius:0;">
+                <span class="ph-icon">📸</span>
+                <span class="ph-label">Baby Photo 1</span>
+              </div>
+              <p class="polaroid-caption">First smile ☀️</p>
+            </div>
+          </div>
+
+          <div class="photo-rope-wrap reveal" style="--delay:0.35s" role="listitem">
+            <div class="photo-rope"></div>
+            <div class="photo-polaroid" data-lightbox data-src="" data-caption="School days magic 📚">
+              <div class="photo-placeholder" style="width:180px;height:180px;min-height:180px;border-radius:0;">
+                <span class="ph-icon">🎒</span>
+                <span class="ph-label">School Photo</span>
+              </div>
+              <p class="polaroid-caption">School days 📚</p>
+            </div>
+          </div>
+
+          <div class="photo-rope-wrap reveal" style="--delay:0.5s" role="listitem">
+            <div class="photo-rope"></div>
+            <div class="photo-polaroid" data-lightbox data-src="" data-caption="Always the funny one 😂">
+              <div class="photo-placeholder" style="width:180px;height:180px;min-height:180px;border-radius:0;">
+                <span class="ph-icon">😄</span>
+                <span class="ph-label">Funny Moment</span>
+              </div>
+              <p class="polaroid-caption">Always funny 😂</p>
+            </div>
+          </div>
+
+          <div class="photo-rope-wrap reveal" style="--delay:0.65s" role="listitem">
+            <div class="photo-rope"></div>
+            <div class="photo-polaroid" data-lightbox data-src="" data-caption="Our adventure together 🌈">
+              <div class="photo-placeholder" style="width:180px;height:180px;min-height:180px;border-radius:0;">
+                <span class="ph-icon">🌈</span>
+                <span class="ph-label">Adventure</span>
+              </div>
+              <p class="polaroid-caption">Adventures 🌈</p>
+            </div>
+          </div>
+
+          <div class="photo-rope-wrap reveal" style="--delay:0.8s" role="listitem">
+            <div class="photo-rope"></div>
+            <div class="photo-polaroid" data-lightbox data-src="" data-caption="Birthday girl 🎂">
+              <div class="photo-placeholder" style="width:180px;height:180px;min-height:180px;border-radius:0;">
+                <span class="ph-icon">🎂</span>
+                <span class="ph-label">Birthday</span>
+              </div>
+              <p class="polaroid-caption">Birthday girl 🎂</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 2 — FAMILY
+         ==================================================== -->
+    <section id="section-family" class="section" data-section="2" data-audio="family">
+      <div class="family-lights" aria-hidden="true"></div>
+      <div class="floating-hearts-wrap" id="heartsWrap" aria-hidden="true"></div>
+
+      <!-- Fairy lights string (decorative) -->
+      <div class="fairy-lights-string" aria-hidden="true" id="fairyLights"></div>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Two</p>
+        <h2 class="section-title text-gradient-gold reveal">
+          Where It All Began —<br/><em>Family</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">
+          "घर कभी कोई जगह नहीं थी...<br/>
+          घर वहाँ था जहाँ तुम मुस्कुराती थी।"<br/>
+          <span style="font-size:0.8em; color:rgba(255,255,255,0.45); font-family:var(--font-body);">
+            "Home was never a place...<br/>it was wherever you smiled."
+          </span>
+        </p>
+
+        <!-- Family photo wall -->
+        <div class="family-photo-wall reveal" role="list" aria-label="Family photos">
+          <!-- Add real photos — src pointing to assets/images/family/ -->
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="Mama & Papa 💛" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">👨‍👩‍👧</span><span class="ph-label">Mama & Papa</span></div>
+            <p class="member-name">Mama & Papa 💛</p>
+          </div>
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="Dadi Maa 🌸" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">👵</span><span class="ph-label">Dadi Maa</span></div>
+            <p class="member-name">Dadi Maa 🌸</p>
+          </div>
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="Bhaiya 🤝" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">🤝</span><span class="ph-label">Bhaiya</span></div>
+            <p class="member-name">Bhaiya 🤝</p>
+          </div>
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="All Together 🏠" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">🏠</span><span class="ph-label">Family</span></div>
+            <p class="member-name">All Together 🏠</p>
+          </div>
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="Cousins 🥰" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">🥰</span><span class="ph-label">Cousins</span></div>
+            <p class="member-name">Cousins 🥰</p>
+          </div>
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="Festival Together 🪔" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">🪔</span><span class="ph-label">Festival</span></div>
+            <p class="member-name">Festival 🪔</p>
+          </div>
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="Road Trip 🚗" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">🚗</span><span class="ph-label">Road Trip</span></div>
+            <p class="member-name">Road Trip 🚗</p>
+          </div>
+          <div class="family-photo-item" role="listitem" data-lightbox data-src="" data-caption="Our Warmth ❤️" tabindex="0">
+            <div class="photo-placeholder"><span class="ph-icon">❤️</span><span class="ph-label">Our Love</span></div>
+            <p class="member-name">Our Warmth ❤️</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 3 — FESTIVALS
+         ==================================================== -->
+    <section id="section-festivals" class="section" data-section="3" data-audio="festival">
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Three</p>
+        <h2 class="section-title text-gradient-gold reveal">
+          Every Festival<br/><em>Was Brighter With You</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">
+          "हर त्योहार तेरे आने से पहले अधूरा था..."
+        </p>
+
+        <div class="festival-cards-grid reveal" role="list" aria-label="Festival memories">
+          <!-- Diwali -->
+          <article class="festival-card festival-diwali" role="listitem" tabindex="0"
+                   data-festival="diwali" aria-label="Open Diwali memories">
+            <div class="festival-card-bg"></div>
+            <div class="festival-card-overlay">
+              <span class="festival-icon">🪔</span>
+              <h3 class="festival-name">Diwali</h3>
+              <span class="festival-badge">Festival of Lights</span>
+            </div>
+          </article>
+
+          <!-- Holi -->
+          <article class="festival-card festival-holi" role="listitem" tabindex="0"
+                   data-festival="holi" aria-label="Open Holi memories">
+            <div class="festival-card-bg"></div>
+            <div class="festival-card-overlay">
+              <span class="festival-icon">🎨</span>
+              <h3 class="festival-name">Holi</h3>
+              <span class="festival-badge">Festival of Colors</span>
+            </div>
+          </article>
+
+          <!-- Raksha Bandhan -->
+          <article class="festival-card festival-raksha" role="listitem" tabindex="0"
+                   data-festival="raksha" aria-label="Open Raksha Bandhan memories">
+            <div class="festival-card-bg"></div>
+            <div class="festival-card-overlay">
+              <span class="festival-icon">🎀</span>
+              <h3 class="festival-name">Raksha Bandhan</h3>
+              <span class="festival-badge">Bond of Love</span>
+            </div>
+          </article>
+
+          <!-- Birthday -->
+          <article class="festival-card festival-birthday" role="listitem" tabindex="0"
+                   data-festival="birthday" aria-label="Open Birthday memories">
+            <div class="festival-card-bg"></div>
+            <div class="festival-card-overlay">
+              <span class="festival-icon">🎂</span>
+              <h3 class="festival-name">Birthday</h3>
+              <span class="festival-badge">Your Special Day</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 4 — SCHOOL LIFE
+         ==================================================== -->
+    <section id="section-school" class="section" data-section="4" data-audio="school">
+      <div class="notebook-lines" aria-hidden="true"></div>
+
+      <!-- Paper planes -->
+      <span class="paper-plane" style="--dur:8s;--delay:0s;--start-y:80px;--end-y:-80px;" aria-hidden="true">✈️</span>
+      <span class="paper-plane" style="--dur:12s;--delay:4s;--start-y:200px;--end-y:50px;" aria-hidden="true">🛩️</span>
+
+      <div class="section-inner">
+        <div class="text-center">
+          <p class="section-label reveal">Chapter Four</p>
+          <h2 class="section-title text-gradient-purple reveal">
+            School Days<br/><em>& Golden Memories</em>
+          </h2>
+          <div class="divider"></div>
+          <p class="section-shayari reveal">
+            "वो स्कूल का घंटी बजना, वो दोस्तों का शोर...<br/>
+            वो यादें आज भी दिल को गुदगुदाती हैं।"
+          </p>
+        </div>
+
+        <!-- Timeline -->
+        <div class="school-timeline" aria-label="School life timeline">
+          <div class="timeline-item reveal">
+            <div class="timeline-dot"></div>
+            <p class="timeline-year">NURSERY — KG</p>
+            <p class="timeline-content">The world was new and everything was a wonder. You walked in with your tiny bag and came home with the biggest smile. 🎒</p>
+          </div>
+          <div class="timeline-item reveal">
+            <div class="timeline-dot"></div>
+            <p class="timeline-year">PRIMARY SCHOOL</p>
+            <p class="timeline-content">First friendships. First drawing competitions. First gold stars on your notebook. You were already a star. ⭐</p>
+          </div>
+          <div class="timeline-item reveal">
+            <div class="timeline-dot"></div>
+            <p class="timeline-year">MIDDLE SCHOOL</p>
+            <p class="timeline-content">Sports days, annual functions, mischief and magic. Every teacher remembered your name. 🏆</p>
+          </div>
+          <div class="timeline-item reveal">
+            <div class="timeline-dot"></div>
+            <p class="timeline-year">HIGH SCHOOL</p>
+            <p class="timeline-content">Late-night studies, board exam nerves, and the pride in your eyes when results came out. You made us so proud. 📖</p>
+          </div>
+        </div>
+
+        <!-- School Photo Grid -->
+        <div class="photo-grid cols-4 reveal" style="max-width:900px; margin: var(--space-lg) auto 0;" role="list" aria-label="School photos">
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="First day at school 🎒">
+            <div class="photo-placeholder"><span class="ph-icon">🎒</span><span class="ph-label">First Day</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="With best friends 👯">
+            <div class="photo-placeholder"><span class="ph-icon">👯</span><span class="ph-label">Best Friends</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="Annual function 🎤">
+            <div class="photo-placeholder"><span class="ph-icon">🎤</span><span class="ph-label">Annual Function</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="Trophy time 🏆">
+            <div class="photo-placeholder"><span class="ph-icon">🏆</span><span class="ph-label">Achievement</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 5 — COLLEGE
+         ==================================================== -->
+    <section id="section-college" class="section" data-section="5" data-audio="college">
+      <div class="city-lights" aria-hidden="true"></div>
+      <div class="floating-items-wrap" aria-hidden="true">
+        <span class="floating-item" style="--size:2rem;--dur:6s;--delay:0s;left:5%;top:25%;">💻</span>
+        <span class="floating-item" style="--size:1.8rem;--dur:7s;--delay:1s;left:88%;top:30%;">☕</span>
+        <span class="floating-item" style="--size:2rem;--dur:5s;--delay:2s;left:12%;top:60%;">📚</span>
+        <span class="floating-item" style="--size:1.5rem;--dur:8s;--delay:3s;left:78%;top:55%;">✏️</span>
+        <span class="floating-item" style="--size:1.8rem;--dur:6s;--delay:1.5s;left:40%;top:15%;">🌙</span>
+      </div>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Five</p>
+        <h2 class="section-title text-gradient-purple reveal">
+          Dreams Grew Bigger —<br/><em>College Days</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">
+          "सपने और बड़े हो गये...<br/>
+          पर तुम्हारा दिल बिलकुल वैसा ही रहा।"<br/>
+          <span style="font-size:0.8em; color:rgba(255,255,255,0.45); font-family:var(--font-body);">
+            "Dreams became bigger... yet your heart remained exactly the same."
+          </span>
+        </p>
+
+        <div class="photo-grid cols-3 reveal" style="max-width:900px; margin: var(--space-lg) auto 0;" role="list" aria-label="College photos">
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="College campus life 🏫">
+            <div class="photo-placeholder" style="aspect-ratio:4/3;"><span class="ph-icon">🏫</span><span class="ph-label">Campus</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="Late night studies ☕">
+            <div class="photo-placeholder" style="aspect-ratio:4/3;"><span class="ph-icon">☕</span><span class="ph-label">Late Nights</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="College friends 🎉">
+            <div class="photo-placeholder" style="aspect-ratio:4/3;"><span class="ph-icon">🎉</span><span class="ph-label">Friends</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="Graduation day 🎓">
+            <div class="photo-placeholder" style="aspect-ratio:4/3;"><span class="ph-icon">🎓</span><span class="ph-label">Graduation</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="College fest 🎭">
+            <div class="photo-placeholder" style="aspect-ratio:4/3;"><span class="ph-icon">🎭</span><span class="ph-label">College Fest</span></div>
+          </div>
+          <div class="photo-item" role="listitem" data-lightbox data-src="" data-caption="Achievement unlocked 🏅">
+            <div class="photo-placeholder" style="aspect-ratio:4/3;"><span class="ph-icon">🏅</span><span class="ph-label">Achievement</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 6 — DIFFICULT TIMES
+         ==================================================== -->
+    <section id="section-struggle" class="section" data-section="6" data-audio="rain">
+      <div class="rain-container" id="rainContainer" aria-hidden="true"></div>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Six</p>
+        <h2 class="section-title reveal" style="color:rgba(255,255,255,0.85);">
+          Even in <em style="color:var(--c-rose-soft); font-style:italic;">Storms</em><br/>You Never Stopped
+        </h2>
+        <div class="divider"></div>
+
+        <!-- Window frame with rain -->
+        <div class="window-frame reveal" style="max-width:500px; margin: var(--space-lg) auto;">
+          <div class="rain-on-glass" id="rainGlass" aria-hidden="true"></div>
+          <div class="window-content">
+            <div>
+              <p class="section-shayari" style="opacity:1; text-align:center; max-width:400px;">
+                "कभी-कभी तुम मुस्कुरा देती थी...<br/>
+                जब किसी को नहीं पता था कि तुम टूट रही हो।"<br/>
+                <span style="font-size:0.8em; color:rgba(255,255,255,0.45); font-family:var(--font-body); display:block; margin-top:8px;">
+                  "Sometimes you smiled...<br/>when nobody knew you were hurting."
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emotional quote reveal -->
+        <div class="glass-card reveal" style="max-width:600px; margin: var(--space-md) auto; text-align:center;">
+          <p style="font-family:var(--font-accent); font-size:var(--fs-md); line-height:1.9; color:rgba(255,255,255,0.7);">
+            Every dark night you faced made you more beautiful.<br/>
+            Every tear you shed was a flower that bloomed in secret.<br/>
+            You carried the weight of the world with grace.<br/>
+            <strong style="color:var(--c-rose-soft);">And we saw it all.</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 7 — LONELINESS
+         ==================================================== -->
+    <section id="section-loneliness" class="section" data-section="7" data-audio="lonely">
+      <div class="lone-moon" aria-hidden="true"></div>
+      <div class="falling-leaves-wrap" aria-hidden="true" id="leavesWrap"></div>
+      <div class="silhouette-walk" aria-hidden="true">🚶‍♀️</div>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Seven</p>
+        <h2 class="section-title reveal" style="color:rgba(255,255,255,0.7);">
+          In the <em style="color:var(--c-champagne); font-style:italic;">Silence</em><br/>of Your Soul
+        </h2>
+        <div class="divider"></div>
+
+        <!-- Word-by-word reveal text -->
+        <p class="lone-text-reveal section-shayari" id="loneText" style="opacity:1; font-size:var(--fs-lg); line-height:2;">
+          "अपनी खामोशी में भी...<br/>
+          तुम सबके लिये प्यार बाँटती रहीं।"
+        </p>
+
+        <p style="font-family:var(--font-body); font-size:var(--fs-sm); color:rgba(255,255,255,0.35); margin-top: var(--space-sm);">
+          "Even in your silence... you never stopped caring for everyone."
+        </p>
+
+        <div class="glass-card reveal" style="max-width:560px; margin: var(--space-lg) auto; text-align:center;">
+          <p style="font-family:var(--font-accent); font-size:var(--fs-md); line-height:2; color:rgba(255,255,255,0.7);">
+            Those moments when you sat alone by the window,<br/>
+            watching the rain — I wish I had sat beside you.<br/>
+            <strong style="color:var(--c-champagne);">You were never alone. You are never alone.</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 8 — SUCCESS
+         ==================================================== -->
+    <section id="section-success" class="section" data-section="8" data-audio="success">
+      <div class="success-sunrise" aria-hidden="true"></div>
+      <div class="success-mountains" aria-hidden="true">
+        <svg class="mountain-svg" viewBox="0 0 1200 200" fill="none" preserveAspectRatio="none">
+          <polygon fill="rgba(255,140,30,0.5)" points="0,200 200,60 400,130 600,20 800,100 1000,50 1200,120 1200,200"/>
+          <polygon fill="rgba(255,100,20,0.3)" points="0,200 300,90 550,150 750,60 950,130 1200,80 1200,200"/>
+        </svg>
+      </div>
+
+      <!-- Flying birds -->
+      <span class="flying-bird" style="--size:22px;--dur:14s;--delay:0s;top:20%;">🕊️</span>
+      <span class="flying-bird" style="--size:16px;--dur:18s;--delay:2s;top:30%;">🕊️</span>
+      <span class="flying-bird" style="--size:20px;--dur:12s;--delay:5s;top:15%;">🦅</span>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Eight</p>
+        <h2 class="section-title text-gradient-gold reveal">
+          Every Storm Made<br/><em>You Stronger</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">
+          "हर तूफान ने तुम्हें और मजबूत बनाया...<br/>
+          तुम्हारी हर जीत हमारा गर्व है।"
+        </p>
+
+        <div class="success-grid reveal">
+          <div class="achievement-card">
+            <div class="achievement-icon">🎓</div>
+            <h3 class="achievement-title">Education</h3>
+            <p class="achievement-desc">Add your achievement here</p>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-icon">🏆</div>
+            <h3 class="achievement-title">Awards</h3>
+            <p class="achievement-desc">Add your achievement here</p>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-icon">💼</div>
+            <h3 class="achievement-title">Career</h3>
+            <p class="achievement-desc">Add your achievement here</p>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-icon">❤️</div>
+            <h3 class="achievement-title">As a Daughter</h3>
+            <p class="achievement-desc">Always the pride of our home</p>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-icon">🌟</div>
+            <h3 class="achievement-title">As a Sister</h3>
+            <p class="achievement-desc">My forever inspiration</p>
+          </div>
+          <div class="achievement-card">
+            <div class="achievement-icon">🌺</div>
+            <h3 class="achievement-title">As a Person</h3>
+            <p class="achievement-desc">The kindest soul I know</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 9 — MEMORY THEATER
+         ==================================================== -->
+    <section id="section-theater" class="section" data-section="9" data-audio="theater">
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Nine</p>
+        <h2 class="section-title text-gradient-rose reveal">
+          The Memory<br/><em>Theater</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">A cinema of our most beautiful moments...</p>
+
+        <div class="theater-wrap reveal" id="theaterWrap">
+          <div class="curtain-left" aria-hidden="true"></div>
+          <div class="curtain-right" aria-hidden="true"></div>
+
+          <div class="theater-screen" id="theaterScreen">
+            <div class="theater-screen-placeholder" id="theaterPlaceholder">
+              <div class="play-icon">🎬</div>
+              <p>Your family videos go here</p>
+              <p style="font-size:0.8em; color:rgba(255,255,255,0.2); margin-top:8px;">Add video files to <code>assets/videos/</code> and update the playlist in <code>data/content.js</code></p>
+            </div>
+            <video id="theaterVideo" style="display:none; width:100%; height:100%; object-fit:contain;" controls></video>
+          </div>
+
+          <!-- Controls -->
+          <div class="theater-controls">
+            <button class="theater-btn" id="theaterPlay" aria-label="Play/Pause"><i class="fa-solid fa-play"></i></button>
+            <div class="theater-progress" id="theaterProgress" role="progressbar">
+              <div class="theater-progress-bar" id="theaterProgressBar"></div>
+            </div>
+            <button class="theater-btn" id="theaterPrev" aria-label="Previous video"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="theater-btn" id="theaterNext" aria-label="Next video"><i class="fa-solid fa-forward-step"></i></button>
+            <button class="theater-btn" id="theaterFullscreen" aria-label="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+          </div>
+
+          <!-- Thumbnails -->
+          <div class="video-thumbnails" id="videoThumbnails" role="list" aria-label="Video playlist"></div>
+        </div>
+
+        <button class="btn-ghost reveal" id="theaterOpenBtn" style="margin-top:var(--space-md);">
+          <i class="fa-solid fa-film"></i> Open Curtains
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 10 — SECRET GIFTS
+         ==================================================== -->
+    <section id="section-gifts" class="section" data-section="10" data-audio="gifts">
+      <canvas class="particles-canvas" id="giftsCanvas" aria-hidden="true"></canvas>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Ten</p>
+        <h2 class="section-title text-gradient-purple reveal">
+          Secret Surprises<br/><em>Just For You</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">Click each gift to discover what's inside...</p>
+
+        <div class="gifts-grid reveal" role="list" aria-label="Secret gift boxes" id="giftsGrid">
+          <!-- Gifts rendered by JS from data/content.js -->
+          <div class="gift-item" role="listitem" data-gift="0" tabindex="0" aria-label="Gift 1 - A Secret Letter">
+            <div class="gift-box" style="--c-body:#6b21a8; --c-lid:#7c3aed;">
+              <div class="gift-lid"><div class="gift-ribbon-h"></div></div>
+              <div class="gift-body"><div class="gift-ribbon-v"></div></div>
+              <div class="gift-bow">🎀</div>
+            </div>
+            <p class="gift-label">A Letter</p>
+          </div>
+
+          <div class="gift-item" role="listitem" data-gift="1" tabindex="0" aria-label="Gift 2 - A Memory">
+            <div class="gift-box" style="--c-body:#be185d; --c-lid:#db2777;">
+              <div class="gift-lid"><div class="gift-ribbon-h"></div></div>
+              <div class="gift-body"><div class="gift-ribbon-v"></div></div>
+              <div class="gift-bow">🎁</div>
+            </div>
+            <p class="gift-label">A Memory</p>
+          </div>
+
+          <div class="gift-item" role="listitem" data-gift="2" tabindex="0" aria-label="Gift 3 - A Funny Moment">
+            <div class="gift-box" style="--c-body:#b45309; --c-lid:#d97706;">
+              <div class="gift-lid"><div class="gift-ribbon-h"></div></div>
+              <div class="gift-body"><div class="gift-ribbon-v"></div></div>
+              <div class="gift-bow">🎊</div>
+            </div>
+            <p class="gift-label">A Funny Secret</p>
+          </div>
+
+          <div class="gift-item" role="listitem" data-gift="3" tabindex="0" aria-label="Gift 4 - A Promise">
+            <div class="gift-box" style="--c-body:#065f46; --c-lid:#059669;">
+              <div class="gift-lid"><div class="gift-ribbon-h"></div></div>
+              <div class="gift-body"><div class="gift-ribbon-v"></div></div>
+              <div class="gift-bow">💚</div>
+            </div>
+            <p class="gift-label">A Promise</p>
+          </div>
+
+          <div class="gift-item" role="listitem" data-gift="4" tabindex="0" aria-label="Gift 5 - Our Song">
+            <div class="gift-box" style="--c-body:#1e3a8a; --c-lid:#1d4ed8;">
+              <div class="gift-lid"><div class="gift-ribbon-h"></div></div>
+              <div class="gift-body"><div class="gift-ribbon-v"></div></div>
+              <div class="gift-bow">💙</div>
+            </div>
+            <p class="gift-label">Our Song</p>
+          </div>
+
+          <div class="gift-item" role="listitem" data-gift="5" tabindex="0" aria-label="Gift 6 - A Surprise">
+            <div class="gift-box" style="--c-body:#7f1d1d; --c-lid:#991b1b;">
+              <div class="gift-lid"><div class="gift-ribbon-h"></div></div>
+              <div class="gift-body"><div class="gift-ribbon-v"></div></div>
+              <div class="gift-bow">❤️</div>
+            </div>
+            <p class="gift-label">A Surprise</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         PAGE 11 — WISHES FROM EVERYONE
+         ==================================================== -->
+    <section id="section-wishes" class="section" data-section="11" data-audio="wishes">
+      <canvas class="particles-canvas" id="wishesCanvas" aria-hidden="true"></canvas>
+
+      <div class="section-inner text-center">
+        <p class="section-label reveal">Chapter Eleven</p>
+        <h2 class="section-title text-gradient-rose reveal">
+          Everyone is<br/><em>Wishing You Today</em>
+        </h2>
+        <div class="divider"></div>
+        <p class="section-shayari reveal">
+          "आज पूरी दुनिया तुम्हारे लिये दुआ माँग रही है।"
+        </p>
+
+        <div class="wishes-grid reveal" role="list" aria-label="Birthday wishes" id="wishesGrid">
+          <!-- Populated from data/content.js or add manually -->
+          <div class="wish-card" role="listitem" style="--c-accent:rgba(245,158,11,0.1);">
+            <div class="wish-avatar">👨</div>
+            <h3 class="wish-name">Papa</h3>
+            <p class="wish-relation">Father</p>
+            <p class="wish-message">"You are the light of our home. Happy Birthday beta, we love you more than words can say."</p>
+            <button class="wish-play-btn" data-audio-src="" aria-label="Play Papa's voice message">
+              🎵 Play Voice Note
+            </button>
+          </div>
+
+          <div class="wish-card" role="listitem" style="--c-accent:rgba(244,63,94,0.1);">
+            <div class="wish-avatar">👩</div>
+            <h3 class="wish-name">Mama</h3>
+            <p class="wish-relation">Mother</p>
+            <p class="wish-message">"My heart walks outside my body whenever I see you. Happy Birthday my jaan. 💕"</p>
+            <button class="wish-play-btn" data-audio-src="" aria-label="Play Mama's voice message">
+              🎵 Play Voice Note
+            </button>
+          </div>
+
+          <div class="wish-card" role="listitem" style="--c-accent:rgba(139,92,246,0.1);">
+            <div class="wish-avatar">🤝</div>
+            <h3 class="wish-name">Bhaiya</h3>
+            <p class="wish-relation">Brother</p>
+            <p class="wish-message">"You are my first best friend, my forever protector. I am so proud of you. Happy Birthday didi! 🥳"</p>
+            <button class="wish-play-btn" data-audio-src="" aria-label="Play Bhaiya's voice message">
+              🎵 Play Voice Note
+            </button>
+          </div>
+
+          <div class="wish-card" role="listitem" style="--c-accent:rgba(52,211,153,0.1);">
+            <div class="wish-avatar">👵</div>
+            <h3 class="wish-name">Dadi Maa</h3>
+            <p class="wish-relation">Grandmother</p>
+            <p class="wish-message">"Meri ladli, may God always keep you smiling. You are our family's treasure. 🌸"</p>
+            <button class="wish-play-btn" data-audio-src="" aria-label="Play Dadi Maa's voice message">
+              🎵 Play Voice Note
+            </button>
+          </div>
+
+          <div class="wish-card" role="listitem" style="--c-accent:rgba(251,146,60,0.1);">
+            <div class="wish-avatar">👩‍🦱</div>
+            <h3 class="wish-name">Best Friend</h3>
+            <p class="wish-relation">Forever Friend</p>
+            <p class="wish-message">"Add your best friend's wish here. Tell her something only you two know! 🤫"</p>
+            <button class="wish-play-btn" data-audio-src="" aria-label="Play friend's voice message">
+              🎵 Play Voice Note
+            </button>
+          </div>
+
+          <div class="wish-card" role="listitem" style="--c-accent:rgba(167,139,250,0.1);">
+            <div class="wish-avatar">✨</div>
+            <h3 class="wish-name">Add More</h3>
+            <p class="wish-relation">Family & Friends</p>
+            <p class="wish-message">"Add more wish cards from relatives, cousins, teachers, or friends in data/content.js 💌"</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================
+         FINAL PAGE — THE GRAND FINALE
+         ==================================================== -->
+    <section id="section-final" class="section" data-section="12" data-audio="ending">
+      <div class="lake-reflection" aria-hidden="true"></div>
+      <div class="final-tree" aria-hidden="true">🌳</div>
+
+      <!-- Lanterns -->
+      <span class="lantern" style="--dur:7s;--delay:0s;--dx:30px;left:10%;top:20%;" aria-hidden="true">🏮</span>
+      <span class="lantern" style="--dur:9s;--delay:1s;--dx:-20px;left:25%;top:35%;" aria-hidden="true">🏮</span>
+      <span class="lantern" style="--dur:6s;--delay:2s;--dx:40px;left:70%;top:25%;" aria-hidden="true">🏮</span>
+      <span class="lantern" style="--dur:8s;--delay:0.5s;--dx:-30px;left:82%;top:40%;" aria-hidden="true">🏮</span>
+      <span class="lantern" style="--dur:10s;--delay:3s;--dx:20px;left:50%;top:15%;" aria-hidden="true">✨</span>
+
+      <div class="section-inner text-center" style="position:relative; z-index:2;">
+        <p class="section-label reveal">Final Chapter</p>
+        <h2 class="section-title reveal" style="font-size:var(--fs-xxl);">
+          <span class="text-gradient-rose">Happy</span><br/>
+          <em style="font-family:var(--font-accent); font-size:1.3em; color:var(--c-champagne);">Birthday</em><br/>
+          <span class="text-gradient-gold">Dear Sister</span>
+        </h2>
+        <div class="divider"></div>
+
+        <!-- The Birthday Letter -->
+        <div class="letter-wrap reveal">
+          <h3 class="letter-header">💌 Dear Sister,</h3>
+          <div class="letter-body">
+            <p>
+              Today, on your birthday, I sat down to write you a letter and realised I don't have
+              enough words. No poem is long enough. No music is beautiful enough. No gift is
+              precious enough for someone like you.
+            </p>
+            <p>
+              I have watched you — the little girl who chased butterflies in our garden, the student
+              who burned midnight oil and still woke up smiling, the daughter who held Mama's hand
+              in tough times, the sister who always made sure everyone else was okay before
+              herself.
+            </p>
+            <p>
+              I have seen you cry in silence when you didn't want to worry anyone. I have seen you
+              laugh so loudly that the whole room lit up. I have seen you carry the weight of the
+              world on your shoulders and still walk gracefully.
+            </p>
+            <p style="color:var(--c-rose-soft);">
+              You are not just my sister. You are my first friend, my safe place, my inspiration,
+              my home.
+            </p>
+            <p>
+              Thank you for every fight we had — because every fight was proof that we care.
+              Thank you for every hug — because every hug felt like the safest place on earth.
+              Thank you for every smile — because it made my world beautiful.
+              Thank you for every sacrifice you made quietly, for this family, for me.
+            </p>
+            <p style="color:var(--c-champagne);">
+              "तू मेरी जान है। तू मेरा गर्व है। तू मेरी दुनिया है।"<br/>
+              <span style="font-size:0.8em; color:rgba(255,255,255,0.45); font-family:var(--font-body);">
+                "You are my life. You are my pride. You are my world."
+              </span>
+            </p>
+            <p>
+              May this year bring you everything your heart secretly wishes for. May you laugh
+              more than you cry. May you achieve everything you dream of. May every morning
+              feel like a gift.
+            </p>
+          </div>
+          <div class="letter-signature">
+            With all my love, always yours — <strong>Your Brother / Sister ❤️</strong><br/>
+            <span style="font-size:0.8em; color:rgba(255,255,255,0.4);">(Replace with your name)</span>
+          </div>
+        </div>
+
+        <!-- 3D Final Gift -->
+        <div class="final-gift-wrap reveal">
+          <p class="section-shayari" style="opacity:1; margin-bottom:var(--space-md);">
+            One last surprise is waiting for you... 🎁
+          </p>
+
+          <div class="final-gift-box" id="finalGiftBox" role="button" tabindex="0" aria-label="Open your final gift">
+            <div class="gift-lid" id="finalGiftLid"><div class="gift-ribbon-h"></div></div>
+            <div class="gift-body"><div class="gift-ribbon-v"></div></div>
+            <div class="gift-bow">🎀</div>
+          </div>
+
+          <button class="btn-primary" id="btnOpenFinalGift" aria-label="Open final gift" style="margin-top:var(--space-md);">
+            🎁 Open Your Final Gift
+          </button>
+        </div>
+
+        <p style="margin-top:var(--space-xl); font-family:var(--font-accent); font-size:2rem; color:var(--c-rose-soft);">
+          ❤️ Happy Birthday ❤️
+        </p>
+        <p style="font-size:var(--fs-sm); color:rgba(255,255,255,0.25); margin-top:var(--space-sm);">
+          Made with love • Every pixel placed with care • Just for you
+        </p>
+      </div>
+    </section>
+
+  </main><!-- /main -->
+
+  <!-- ================================================================
+       SCRIPTS — Load order matters
+       ================================================================ -->
+
+  <!-- GSAP (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Content data (edit this file to add your photos, videos, messages) -->
+  <script src="data/content.js"></script>
+
+  <!-- Core modules -->
+  <script src="js/cursor.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/gallery.js"></script>
+  <script src="js/interactions.js"></script>
+
+  <!-- Main app bootstrap -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
