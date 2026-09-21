@@ -1,0 +1,14 @@
+Feature,Data Type,Unit / Values,Original Kaggle Definition,Analytical Usage & Processing
+id,Integer,Unique ID,Patient identifier,Primary key for record indexing
+age,Integer,Days,Age of patient in days,Converted to age_years (age / 365.25) and age_groups
+gender,Integer,1: Female; 2: Male,Gender of patient,Mapped to gender_label (1=Female; 2=Male)
+height,Integer,cm,Height in centimeters,Filtered range 100-220 cm; used for BMI calculation
+weight,Float,kg,Weight in kilograms,Filtered range 30-200 kg; used for BMI calculation
+ap_hi,Integer,mmHg,Systolic blood pressure,Filtered range 60-240 mmHg; key clinical indicator
+ap_lo,Integer,mmHg,Diastolic blood pressure,Filtered range 40-160 mmHg; requires ap_hi > ap_lo
+cholesterol,Integer,1: Normal; 2: Above Normal; 3: Well Above Normal,Cholesterol level,Categorical rank feature
+gluc,Integer,1: Normal; 2: Above Normal; 3: Well Above Normal,Glucose level,Categorical rank feature
+smoke,Integer,0: Non-smoker; 1: Smoker,Smoking binary flag,Behavioral risk factor
+alco,Integer,0: Non-drinker; 1: Alcohol consumer,Alcohol intake binary flag,Behavioral risk factor
+active,Integer,0: Inactive; 1: Active,Physical activity binary flag,Lifestyle factor
+cardio,Integer,0: Absence; 1: Presence of CVD,Target variable (Cardiovascular Disease),Primary analytical and prediction target

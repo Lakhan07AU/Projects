@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# Environments
+env/
+venv/
+ENV/
+
+# Data & SQLite artifacts if needed to ignore temporary databases
+*.log
+*.tmp
+
+# Operating system files
+.DS_Store
+Thumbs.db
