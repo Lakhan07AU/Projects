@@ -221,5 +221,5 @@ python -m nbconvert --to notebook --execute notebooks/*.ipynb --inplace
 
 ## Author & License
 
-- **Author**: Senior Data Analyst / Data Scientist
+- **Author**: Lakhan Singh
 - **License**: MIT License
