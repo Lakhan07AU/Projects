@@ -174,9 +174,7 @@ Cardiovascular-Disease-Data-Analysis/
 └── reports/
     ├── methodology.md
     ├── insights.md
-    ├── limitations.md
-    ├── interview_questions.md
-    └── project_explanation.md
+    └── limitations.md
 ```
 
 ---
